@@ -1,12 +1,8 @@
 import { Component, ViewChild, Renderer, ElementRef } from '@angular/core';
 import { IonicPage,Platform } from 'ionic-angular';
+import leaflet from 'leaflet';
 
-import OlMap from 'ol/map';
-import OlXYZ from 'ol/source/xyz';
-import OlTileLayer from 'ol/layer/tile';
-import OlView from 'ol/view';
-import OlProj from 'ol/proj';
-// import * as ol from 'openlayers';
+import { appResource } from '../../_resources/app.resource';
 
 
 @IonicPage()
@@ -16,39 +12,55 @@ import OlProj from 'ol/proj';
 })
 export class OpenMapPage {
   
-  map: OlMap;
-  source: OlXYZ;
-  layer: OlTileLayer;
-  view: OlView;
- 
+  @ViewChild('map') mapContainer: ElementRef;
+  map: any;
   constructor(platform: Platform, public renderer: Renderer) {
-    platform.ready().then(() => {
-      console.log("Platform is ready");
-      this.loadMap();
+    
+  }
+  ionViewDidEnter() {
+    this.loadmap();
+  }
+  onLocationFound(e) {
+    var radius = e.accuracy / 2;
+
+    leaflet.marker(e.latlng).addTo(this.map)
+        .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+    leaflet.circle(e.latlng, radius).addTo(this.map);
+  }
+
+  loadmap() {
+    this.map = leaflet.map("map").fitWorld();
+    leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attributions: 'www.tphangout.com',
+      maxZoom: 18
+    }).addTo(this.map);
+    this.map.locate({setView: true, maxZoom: 12}).on('locationfound', (e) => {
+      let markerGroup = leaflet.featureGroup();
+      let marker: any = leaflet.marker([e.latitude, e.longitude]);
+      leaflet.circle([e.latitude, e.longitude], {radius: 5000}).addTo(this.map);
+      let m1: any = leaflet.marker([10.8211003, 106.6163627]).bindPopup("Store");
+
+      marker.bindPopup("Your position");
+
+      markerGroup.addLayer(m1);
+      markerGroup.addLayer(marker);
+      
+      this.map.addLayer(markerGroup);
+      }).on('locationerror', (err) => {
+        alert(err.message);
     })
+    this.addMarker();
   }
-
-  loadMap() {
-    this.source = new OlXYZ({
-      // Tiles from Mapbox (Light)
-      url: 'https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+  addMarker() {
+    console.log('add marker!');
+    let markerGroup = leaflet.featureGroup();
+    Object.keys(appResource.location).forEach((key) =>  {
+      
+      let latLng: any =  [appResource.location[key].lat,appResource.location[key].lng];
+      let marker: any = leaflet.marker(latLng).bindPopup("Location test");
+      markerGroup.addLayer(marker);
     });
-
-    this.layer = new OlTileLayer({
-      source: this.source
-    });
-
-    this.view = new OlView({
-      center: OlProj.fromLonLat([6.661594, 50.433237]),
-      zoom: 3,
-    });
-
-    this.map = new OlMap({
-      target: 'map',
-      layers: [this.layer],
-      view: this.view
-    });
-
+    this.map.addLayer(markerGroup);
   }
-
 }

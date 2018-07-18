@@ -3,4 +3,24 @@ page-home {
     width: 100%;
     height: 100vh;
   }
+  /* homescreen background image */
+.scroll-content {
+    background: url('../assets/imgs/real-estate-wallpaper.jpg');
+    background-size: cover;
+  }
+  .card{
+    padding: 1em;
+
+    background: transparent;
+    position: relative;
+    top: 45%;
+    transform: translateY(-60%);
+  }
+  .welcome {
+    font-size: 4em;
+  }
+  .context{
+    font-size: 2em; 
+    color: white;
+  }
 }
