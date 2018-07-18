@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component} from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import { OpenMapPage } from '../open-map/open-map';
@@ -8,7 +8,9 @@ import { OpenMapPage } from '../open-map/open-map';
   templateUrl: 'home.html'
 })
 export class HomePage {
- 
+  showList: Boolean = false;
+  public listLocationEx: Array<any> = ['Su pham ky thuat', 'ktx D1', 'ktx d2', 'lang dai hoc', 'Suoi tien', 'CoopMark', 'Vincom']
+  public listResults: Array<any> = [];
   constructor(public navCtrl: NavController) {
  
   }
@@ -16,11 +18,21 @@ export class HomePage {
     // go to the MyPage component
     this.navCtrl.push(OpenMapPage);
   }
-  onInput($event){
-    console.log($event);
+  onInput(ev){
+    console.log(this.showList)
+    let val = ev.target.value;
+
+    if (val && val.trim() !== '') {
+      this.showList = true;
+      this.listResults = this.listLocationEx.filter((item) => {
+        return item.toLowerCase().includes(val.toLowerCase());
+      });
+    } else {
+      this.showList = false;
+    }
   }
   onCancel($event){
-    console.log($event);
+    this.showList = false;
   }
   
   

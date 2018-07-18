@@ -27,6 +27,11 @@
     (ionInput)="onInput($event)"
     (ionCancel)="onCancel($event)">>
   </ion-searchbar>
+  <ion-list *ngIf="showList">
+      <ion-item *ngFor="let item of listResults">
+        {{ item }}
+      </ion-item>
+    </ion-list>
   <ion-card text-center class="card">
       <div class="or-label">
         <p class="welcome">Welcome</p>
